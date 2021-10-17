@@ -45,7 +45,6 @@ export const postEdit = async (req, res) => {
     return res.status(404).render("404", { pageTitle: "Video not found." });
   }
   if (String(video.owner) !== String(_id)) {
-    console.log(video, req.body, req.session);
     req.flash("error", "You are not the the owner of the video.");
     return res.status(403).redirect("/");
   }
@@ -66,7 +65,6 @@ export const postUpload = async (req, res) => {
   const {
     user: { _id },
   } = req.session;
-  console.log(req.session);
   const { video, thumb } = req.files;
   const { title, description, hashtags } = req.body;
   const isHeroku = process.env.NODE_ENV === "production";
@@ -84,7 +82,6 @@ export const postUpload = async (req, res) => {
     user.save();
     return res.redirect("/");
   } catch (error) {
-    console.log(error);
     return res.status(400).render("upload", {
       pageTitle: "Upload Video",
       errorMessage: error._message,
