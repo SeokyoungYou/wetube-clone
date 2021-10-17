@@ -1,6 +1,6 @@
 import Video from "../models/Video";
-import User from "../models/User";
 import Comment from "../models/Comment";
+import User from "../models/User";
 
 export const home = async (req, res) => {
   const videos = await Video.find({})
@@ -45,6 +45,7 @@ export const postEdit = async (req, res) => {
     return res.status(404).render("404", { pageTitle: "Video not found." });
   }
   if (String(video.owner) !== String(_id)) {
+    req.flash("error", "You are not the the owner of the video.");
     return res.status(403).redirect("/");
   }
   await Video.findByIdAndUpdate(id, {
@@ -52,7 +53,7 @@ export const postEdit = async (req, res) => {
     description,
     hashtags: Video.formatHashtags(hashtags),
   });
-  req.flash("success", "Changes saved");
+  req.flash("success", "Changes saved.");
   return res.redirect(`/videos/${id}`);
 };
 
@@ -81,6 +82,7 @@ export const postUpload = async (req, res) => {
     user.save();
     return res.redirect("/");
   } catch (error) {
+    console.log(error);
     return res.status(400).render("upload", {
       pageTitle: "Upload Video",
       errorMessage: error._message,
@@ -121,24 +123,23 @@ export const registerView = async (req, res) => {
   const { id } = req.params;
   const video = await Video.findById(id);
   if (!video) {
-    return res.sendStatus(404); //error
+    return res.sendStatus(404);
   }
   video.meta.views = video.meta.views + 1;
   await video.save();
-  return res.sendStatus(200); //ok
+  return res.sendStatus(200);
 };
 
 export const createComment = async (req, res) => {
   const {
-    params: { id },
     session: { user },
     body: { text },
+    params: { id },
   } = req;
   const video = await Video.findById(id);
   if (!video) {
     return res.sendStatus(404);
   }
-  // Comment model 열어서 어떤 object 들어가야하는지 확인하면서 쓸 것
   const comment = await Comment.create({
     text,
     owner: user._id,
@@ -146,5 +147,5 @@ export const createComment = async (req, res) => {
   });
   video.comments.push(comment._id);
   video.save();
-  return res.status(201).json({ newCommentId: comment._id }); //201: Created
+  return res.status(201).json({ newCommentId: comment._id });
 };

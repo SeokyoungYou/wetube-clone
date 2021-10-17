@@ -13,13 +13,13 @@ const isHeroku = process.env.NODE_ENV === "production";
 
 const s3ImageUploader = multerS3({
   s3: s3,
-  bucket: "WetubeQuartz/images",
+  bucket: "wetubequartz/images",
   acl: "public-read",
 });
 
 const s3VideoUploader = multerS3({
   s3: s3,
-  bucket: "WetubeQuartz/videos",
+  bucket: "wetubequartz/videos",
   acl: "public-read",
 });
 
@@ -35,7 +35,7 @@ export const protectorMiddleware = (req, res, next) => {
   if (req.session.loggedIn) {
     return next();
   } else {
-    req.flash("error", "Log in first");
+    req.flash("error", "Log in first.");
     return res.redirect("/login");
   }
 };
