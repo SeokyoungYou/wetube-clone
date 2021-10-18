@@ -1,5 +1,21 @@
 const videoContainer = document.getElementById("videoContainer");
 const form = document.getElementById("commentForm");
+const delBtns = document.querySelectorAll(".video__del-comment");
+
+const removeComment = (id) => {
+  const comment = document.querySelector(`[data-id="${id}"]`);
+  comment.remove();
+};
+const handleDelComment = async (event) => {
+  event.preventDefault();
+  const commentId = event.path[1].dataset.id; // X 누른 comment의 data-id 가져오기
+  const response = await fetch(`/api/comments/${commentId}`, {
+    method: "DELETE",
+  });
+  if (response.status === 200) {
+    removeComment(commentId);
+  }
+};
 
 const addComment = (text, id) => {
   const videoComments = document.querySelector(".video__comments ul");
@@ -12,6 +28,7 @@ const addComment = (text, id) => {
   span.innerText = ` ${text}`;
   const span2 = document.createElement("span");
   span2.innerText = "❌";
+  span2.className = ".video__del-comment";
   newComment.appendChild(icon);
   newComment.appendChild(span);
   newComment.appendChild(span2);
@@ -42,4 +59,8 @@ const handleSubmit = async (event) => {
 
 if (form) {
   form.addEventListener("submit", handleSubmit);
+}
+if (delBtns) {
+  for (const delBtn of delBtns)
+    delBtn.addEventListener("click", handleDelComment);
 }
